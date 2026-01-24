@@ -1,0 +1,132 @@
+# joints.yaml
+
+joints:
+  - name: base_yaw
+    board: A
+    index: 0
+    type: revolute
+    continuous: false
+    steps_per_rev: 200
+    microsteps: 16
+    gear_ratio: 10.0
+    direction: 1
+    home:
+      has_switch: false
+      index_sensor: false
+      home_offset_rad: 0.0
+    limits:
+      soft:
+        min_rad: -3.14
+        max_rad: 3.14
+      max_velocity_rad_s: 1.2
+      max_accel_rad_s2: 2.0
+
+  - name: shoulder
+    board: A
+    index: 1
+    type: revolute
+    continuous: false
+    steps_per_rev: 200
+    microsteps: 16
+    gear_ratio: 25.0
+    direction: -1
+    home:
+      has_switch: true
+      switch_polarity: normally_open
+      search_velocity_rad_s: 0.4
+      latch_velocity_rad_s: 0.1
+      home_offset_rad: 0.0
+    limits:
+      hard:
+        min_rad: -1.57
+        max_rad: 1.57
+      soft:
+        min_rad: -1.45
+        max_rad: 1.45
+      max_velocity_rad_s: 0.8
+      max_accel_rad_s2: 1.2
+
+  - name: elbow
+    board: A
+    index: 2
+    type: revolute
+    continuous: false
+    steps_per_rev: 200
+    microsteps: 16
+    gear_ratio: 30.0
+    direction: 1
+    home:
+      has_switch: true
+      switch_polarity: normally_open
+      search_velocity_rad_s: 0.4
+      latch_velocity_rad_s: 0.1
+      home_offset_rad: 0.0
+    limits:
+      hard:
+        min_rad: -2.2
+        max_rad: 2.2
+      soft:
+        min_rad: -2.0
+        max_rad: 2.0
+      max_velocity_rad_s: 0.9
+      max_accel_rad_s2: 1.5
+
+  - name: wrist_roll
+    board: B
+    index: 0
+    type: revolute
+    continuous: false
+    steps_per_rev: 200
+    microsteps: 16
+    gear_ratio: 5.0
+    direction: -1
+    home:
+      has_switch: false
+      index_sensor: false
+      home_offset_rad: 0.0
+    limits:
+      soft:
+        min_rad: -6.28
+        max_rad: 6.28
+      max_velocity_rad_s: 2.5
+      max_accel_rad_s2: 4.0
+
+  - name: wrist_left
+    board: B
+    index: 1
+    type: revolute
+    continuous: false
+    steps_per_rev: 200
+    microsteps: 16
+    gear_ratio: 15.0
+    direction: 1
+    home:
+      has_switch: false
+      index_sensor: false
+      home_offset_rad: 0.0
+    limits:
+      soft:
+        min_rad: -1.75
+        max_rad: 1.75
+      max_velocity_rad_s: 1.5
+      max_accel_rad_s2: 3.0
+
+  - name: wrist_right
+    board: B
+    index: 2
+    type: revolute
+    continuous: false
+    steps_per_rev: 200
+    microsteps: 16
+    gear_ratio: 3.0
+    direction: 1
+    home:
+      has_switch: false
+      index_sensor: false
+      home_offset_rad: 0.0
+    limits:
+      soft:
+        min_rad: -1.57
+        max_rad: 1.57
+      max_velocity_rad_s: 2.0
+      max_accel_rad_s2: 4.0
