@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <Arduino.h>
 
+constexpr uint8_t NUM_JOINTS = 3;
+
 constexpr uint8_t EN_PIN = 8;
 
 constexpr uint8_t STEP_PINS[3] = {2,  // Base yaw
