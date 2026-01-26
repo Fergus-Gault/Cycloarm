@@ -61,7 +61,7 @@ void stepper_set_target(uint8_t joint, int32_t target_steps)
     // Code to set target position for a specific joint
 }
 
-void stepper_update()
+void stepper_update(uint32_t current_time_us)
 {
     // Code to update stepper motor positions
 }
