@@ -43,37 +43,68 @@ void stepper_disable()
 
 void stepper_set_limits(uint8_t joint, int32_t min_steps, int32_t max_steps)
 {
-    // Code to set movement limits for a specific joint
+    g_axes[joint].min_steps = min_steps;
+    g_axes[joint].max_steps = max_steps;
 }
 
 void stepper_set_max_vel(uint8_t joint, int32_t steps_per_s)
 {
-    // Code to set maximum velocity for a specific joint
+    g_axes[joint].max_vel = steps_per_s;
 }
 
 void stepper_set_max_accel(uint8_t joint, int32_t steps_per_s2)
 {
-    // Code to set maximum acceleration for a specific joint
+    g_axes[joint].max_accel = steps_per_s2;
 }
 
 void stepper_set_target(uint8_t joint, int32_t target_steps)
 {
-    // Code to set target position for a specific joint
+    g_axes[joint].target_steps = target_steps;
 }
 
 void stepper_update(uint32_t current_time_us)
 {
-    // Code to update stepper motor positions
+    for (uint8_t i = 0; i < g_num_joints; i++)
+    {
+        StepperAxis &axis = g_axes[i];
+
+        if (!axis.enabled)
+            continue;
+
+        if (axis.pos_steps == axis.target_steps)
+        {
+            axis.v_curr = 0;
+            continue;
+        }
+
+        // Simple constant velocity movement towards target
+        int32_t direction = (axis.target_steps > axis.pos_steps) ? 1 : -1;
+        axis.v_curr = direction * axis.max_vel;
+
+        // Time to next step
+        if (current_time_us >= axis.next_step_us)
+        {
+            // Step
+            digitalWrite(axis.dir_pin, (direction > 0) ? HIGH : LOW);
+            digitalWrite(axis.step_pin, HIGH);
+            delayMicroseconds(2); // Pulse width
+            digitalWrite(axis.step_pin, LOW);
+
+            // Update position
+            axis.pos_steps += direction;
+
+            // Schedule next step
+            axis.next_step_us = current_time_us + (1000000 / abs(axis.v_curr));
+        }
+    }
 }
 
 int32_t stepper_get_position(uint8_t joint)
 {
-    // Code to get current position of a specific joint
-    return 0;
+    return g_axes[joint].pos_steps;
 }
 
 bool stepper_at_target(uint8_t joint)
 {
-    // Code to check if a specific joint has reached its target position
-    return true;
+    return g_axes[joint].pos_steps == g_axes[joint].target_steps;
 }

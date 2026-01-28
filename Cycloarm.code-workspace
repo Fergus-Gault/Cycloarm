@@ -7,5 +7,7 @@
 			"path": "firmware"
 		}
 	],
-    "settings": {}
+    "settings": {
+        "chat.disableAIFeatures": true
+    }
 }
