@@ -4,6 +4,58 @@
 
 StepperAxis axes[NUM_JOINTS];
 
+// TODO: Try add acceleration to overcome stiction
+void move_commands()
+{
+    if (!Serial.available())
+        return;
+
+    String line = Serial.readStringUntil('\n');
+    line.trim();
+    if (line.length() == 0)
+        return;
+
+    char axis_char;
+    long steps;
+
+    // Expect format: "X 100"
+    int parsed = sscanf(line.c_str(), "%c %ld", &axis_char, &steps);
+    if (parsed != 2)
+    {
+        Serial.println("Invalid command");
+        return;
+    }
+
+    uint8_t axis;
+    switch (axis_char)
+    {
+    case 'X':
+    case 'x':
+        axis = 0;
+        break;
+    case 'Y':
+    case 'y':
+        axis = 1;
+        break;
+    case 'Z':
+    case 'z':
+        axis = 2;
+        break;
+    default:
+        Serial.println("Unknown axis");
+        return;
+    }
+
+    axes[axis].target_steps += steps;
+
+    stepper_enable(true); // enable before motion
+
+    Serial.print("Axis ");
+    Serial.print(axis_char);
+    Serial.print(" moving by ");
+    Serial.println(steps);
+}
+
 void setup()
 {
     Serial.begin(115200);
@@ -21,10 +73,12 @@ void setup()
         axes[i].max_accel = 5000; // steps per second squared
     }
     stepper_init(axes, NUM_JOINTS, EN_PIN);
-    stepper_enable(true);
+    stepper_enable(false);
+    Serial.println("Initialised motors on Board B");
 }
 
 void loop()
 {
+    move_commands();
     stepper_update(micros());
 }

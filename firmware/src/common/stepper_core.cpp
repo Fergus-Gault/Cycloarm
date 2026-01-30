@@ -12,6 +12,7 @@ void stepper_init(StepperAxis *axes, uint8_t num_joints, uint8_t en_pin)
     g_en_pin = en_pin;
 
     pinMode(g_en_pin, OUTPUT);
+    digitalWrite(g_en_pin, HIGH);
 
     for (uint8_t i = 0; i < num_joints; i++)
     {

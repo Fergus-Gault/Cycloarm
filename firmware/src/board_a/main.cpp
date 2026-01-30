@@ -21,7 +21,8 @@ void setup()
         axes[i].max_accel = 5000; // steps per second squared
     }
     stepper_init(axes, NUM_JOINTS, EN_PIN);
-    stepper_enable(true);
+    stepper_enable(false);
+    Serial.println("Initialised motors on Board A");
 }
 
 void loop()
