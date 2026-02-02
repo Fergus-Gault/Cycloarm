@@ -1,13 +1,14 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "firmware"
-		}
-	],
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "firmware"
+        }
+    ],
     "settings": {
-        "chat.disableAIFeatures": true
+        "chat.disableAIFeatures": true,
+        "hide-files.files": []
     }
 }

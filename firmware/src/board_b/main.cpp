@@ -29,15 +29,12 @@ void move_commands()
     uint8_t axis;
     switch (axis_char)
     {
-    case 'X':
     case 'x':
         axis = 0;
         break;
-    case 'Y':
     case 'y':
         axis = 1;
         break;
-    case 'Z':
     case 'z':
         axis = 2;
         break;
