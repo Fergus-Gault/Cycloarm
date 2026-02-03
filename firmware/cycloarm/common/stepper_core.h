@@ -8,6 +8,9 @@ struct StepperAxis
     uint8_t dir_pin;
     uint8_t en_pin;
 
+    int gear_ratio;
+    int pulse_width;
+
     // State
     volatile int32_t pos_steps;
     int32_t target_steps;
@@ -25,6 +28,8 @@ struct StepperAxis
     uint32_t next_step_us;
     bool enabled;
 };
+
+constexpr int BASE_PULSE_WIDTH = 50;
 
 void stepper_init(StepperAxis *axes, uint8_t num_joints, uint8_t en_pin);
 void stepper_enable(bool enable);

@@ -4,7 +4,6 @@
 
 StepperAxis axes[NUM_JOINTS];
 
-// TODO: Try add acceleration to overcome stiction
 void move_commands()
 {
     if (!Serial.available())
@@ -61,6 +60,8 @@ void setup()
         axes[i].step_pin = STEP_PINS[i];
         axes[i].dir_pin = DIR_PINS[i];
         axes[i].en_pin = EN_PIN;
+        axes[i].gear_ratio = GEAR_RATIO[i];
+        axes[i].pulse_width = axes[i].gear_ratio * BASE_PULSE_WIDTH;
         axes[i].pos_steps = 0;
         axes[i].target_steps = 0;
 
@@ -71,7 +72,7 @@ void setup()
     }
     stepper_init(axes, NUM_JOINTS, EN_PIN);
     stepper_enable(false);
-    Serial.println("Initialised motors on Board B");
+    Serial.println("Initialised motors on Board A");
 }
 
 void loop()

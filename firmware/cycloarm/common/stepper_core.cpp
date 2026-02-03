@@ -88,9 +88,9 @@ void stepper_update(uint32_t current_time_us)
             // Step
             digitalWrite(axis.dir_pin, (direction > 0) ? HIGH : LOW);
             digitalWrite(axis.step_pin, HIGH);
-            delayMicroseconds(800); // Pulse width
+            delayMicroseconds(axis.pulse_width); // Pulse width
             digitalWrite(axis.step_pin, LOW);
-            delayMicroseconds(800);
+            delayMicroseconds(axis.pulse_width);
 
             // Update position
             axis.pos_steps += direction;

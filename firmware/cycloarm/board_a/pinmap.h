@@ -18,3 +18,7 @@ constexpr uint8_t DIR_PINS[3] = {5,  // Base yaw
 constexpr int8_t ENDSTOP_PINS[3] = {-1,  // Base yaw (no endstop)
                                     10,  // Shoulder
                                     11}; // Elbow
+
+constexpr int GEAR_RATIO[3] = {25,
+                               45,
+                               45};
