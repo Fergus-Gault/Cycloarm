@@ -14,5 +14,6 @@
 #include "serial.h"
 #include "config.h"
 #include "protocol.h"
+#include "utils.h"
 
 #endif
