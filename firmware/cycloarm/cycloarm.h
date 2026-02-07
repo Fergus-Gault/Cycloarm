@@ -13,5 +13,6 @@
 #include "serial.h"
 #include "i2c_link.h"
 #include "stepper_core.h"
+#include "tools.h"
 
 #endif
