@@ -1,36 +1,28 @@
-/*
- This file defines the messages and framing for communication over any transport method.
-*/
-
-#ifndef protocol_h
-#define protocol_h
+#ifndef PROTOCOL_H
+#define PROTOCOL_H
 #include "cycloarm.h"
-// Defining values so that devices know what the message type is
-// The values themselves do not nessecarily matter.
-// This is an agreement as to what the values mean.
 typedef enum
 {
-    MSG_PING = 0x01,        // Diagnostics
-    MSG_STATUS = 0x02,      // Diagnostics
-    MSG_SEGMENT = 0x10,     // Motion
-    MSG_SEGMENT_ACK = 0x11, // Motion
-    MSG_FAULT = 0x20,       // Faults
-    MSG_HOME = 0x22,        // Homing
-    MSG_SET_ZERO = 0x23,    // Homing
+    MSG_PING = 0x01,        // Ping the receiving device.
+    MSG_PING_ACK = 0x02,    // Response sent when pinging
+    MSG_STATUS = 0x03,      // Ask the receiving device for information.
+    MSG_SEGMENT = 0x10,     // Send a motion segment, further data will follow this message.
+    MSG_SEGMENT_ACK = 0x11, // Acknowledgement that the motion segment has been received.
+    MSG_FAULT = 0x20,       // Inform receiving device that there has been a fault.
+    MSG_HOME = 0x22,        // Move to home position
+    MSG_SET_ZERO = 0x23,    // Set the zero-point
+    MSG_END = 0x30,         // End of message indicator
 } msg_type_t;
 
-typedef struct __attribute__((packed))
+// For each board, we will send one of these for a motion segment
+// It will define the board it refers to, the number of steps for each motor
+// and the time frame for the steps to be executed in.
+typedef struct
 {
-    uint16_t segment_id;
+    uint8_t board;
     uint32_t duration_us;
     int32_t steps[3];
-} motion_segment_t;
 
-typedef struct __attribute__((packed))
-{
-    uint8_t state;
-    uint8_t buffer_free;
-    uint16_t last_fault;
-} status_t;
+} motion_segment_t;
 
 #endif
