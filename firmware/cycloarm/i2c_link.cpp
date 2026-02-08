@@ -1,5 +1,7 @@
 #include "cycloarm.h"
 
+// TODO: Update this to mimick the serial implementation.
+
 void i2c_init()
 {
     if (!Wire.available())
@@ -76,8 +78,8 @@ void i2c_read()
             i2c_write(MSG_PING_ACK, NO_DATA);
             break;
         case MSG_STATUS:
-            // status = get_status();
-            // i2c_write(MSG_STATUS, status);
+            status_comb_t status = get_status();
+            i2c_write(MSG_STATUS, status);
             i2c_peek_incoming_byte = Wire.peek();
             if (i2c_peek_incoming_byte != MSG_END)
             {
@@ -110,4 +112,14 @@ void i2c_read()
             break;
         }
     }
+}
+
+void i2c_send_structure(byte *struct_pointer, uint8_t struct_length)
+{
+    Wire.write(struct_pointer, struct_length);
+}
+
+void i2c_read_structure(byte *struct_pointer, uint8_t struct_length)
+{
+    Wire.readBytes(struct_pointer, struct_length);
 }
