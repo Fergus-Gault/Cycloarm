@@ -11,10 +11,23 @@
 
 void stepper_init();
 void move_segment(motion_segment_t motion);
+void set_zero_position();
+void calibrate();
 
 // Will return an encoded mask of the current position of all the motors
 // Or possibly a pointer to an array of positions
 // Or the positions array could be a known location that this function just modifies.
 int32_t poll_position();
+
+#ifdef BOARD_A
+AccelStepper base(AccelStepper::DRIVER, BASE_STEP_PIN, BASE_DIR_PIN);
+AccelStepper shoulder(AccelStepper::DRIVER, SHOULDER_STEP_PIN, SHOULDER_DIR_PIN);
+AccelStepper elbow(AccelStepper::DRIVER, ELBOW_STEP_PIN, ELBOW_DIR_PIN);
+#endif
+#ifdef BOARD_B
+AccelStepper wrist_roll(AccelStepper::DRIVER, WRIST_ROLL_STEP_PIN, WRIST_ROLL_DIR_PIN);
+AccelStepper wrist_left(AccelStepper::DRIVER, WRIST_LEFT_STEP_PIN, WRIST_LEFT_DIR_PIN);
+AccelStepper wrist_right(AccelStepper::DRIVER, WRIST_RIGHT_STEP_PIN, WRIST_RIGHT_DIR_PIN);
+#endif
 
 #endif

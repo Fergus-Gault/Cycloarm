@@ -15,13 +15,11 @@ typedef enum
 } msg_type_t;
 
 // For each board, we will send one of these for a motion segment
-// It will define the board it refers to, the number of steps for each motor
-// and the time frame for the steps to be executed in.
+// It will define the board it refers to, and the position to go to.
 typedef struct
 {
     uint8_t board;
-    uint32_t duration_us;
-    int32_t steps[3];
+    int32_t position[3];
 
 } motion_segment_t;
 

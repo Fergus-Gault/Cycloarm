@@ -6,6 +6,7 @@
 #include <math.h>
 #include <Arduino.h>
 #include <Wire.h>
+#include <AccelStepper.h>
 
 #include "cpu_map.h"
 #include "config.h"
