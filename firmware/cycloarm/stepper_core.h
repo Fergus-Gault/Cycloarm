@@ -14,20 +14,33 @@ void move_segment(motion_segment_t motion);
 void set_zero_position();
 void calibrate();
 
-// Will return an encoded mask of the current position of all the motors
-// Or possibly a pointer to an array of positions
-// Or the positions array could be a known location that this function just modifies.
-int32_t poll_position();
+position_response_t poll_positions();
+
+extern motion_segment_t *last_command;
 
 #ifdef BOARD_A
-AccelStepper base(AccelStepper::DRIVER, BASE_STEP_PIN, BASE_DIR_PIN);
-AccelStepper shoulder(AccelStepper::DRIVER, SHOULDER_STEP_PIN, SHOULDER_DIR_PIN);
-AccelStepper elbow(AccelStepper::DRIVER, ELBOW_STEP_PIN, ELBOW_DIR_PIN);
+extern MultiStepper board_a_steppers;
+constexpr uint32_t base_steps_per_rev = MOTOR_STEPS_PER_REV * BASE_RR;
+extern uint32_t base_limit_low;
+extern uint32_t base_limit_high;
+constexpr uint32_t shoulder_steps_per_rev = MOTOR_STEPS_PER_REV * SHOULDER_RR;
+extern uint32_t shoulder_limit_low;
+extern uint32_t shoulder_limit_high;
+constexpr uint32_t elbow_steps_per_rev = MOTOR_STEPS_PER_REV * ELBOW_RR;
+extern uint32_t elbow_limit_low;
+extern uint32_t elbow_limit_high;
 #endif
 #ifdef BOARD_B
-AccelStepper wrist_roll(AccelStepper::DRIVER, WRIST_ROLL_STEP_PIN, WRIST_ROLL_DIR_PIN);
-AccelStepper wrist_left(AccelStepper::DRIVER, WRIST_LEFT_STEP_PIN, WRIST_LEFT_DIR_PIN);
-AccelStepper wrist_right(AccelStepper::DRIVER, WRIST_RIGHT_STEP_PIN, WRIST_RIGHT_DIR_PIN);
+extern MultiStepper board_b_steppers;
+constexpr uint32_t wrist_roll_steps_per_rev = MOTOR_STEPS_PER_REV * WRIST_ROLL_RR;
+extern uint32_t wrist_roll_limit_low;
+extern uint32_t wrist_roll_limit_high;
+constexpr uint32_t wrist_left_steps_per_rev = MOTOR_STEPS_PER_REV * WRIST_LEFT_RR;
+extern uint32_t wrist_left_limit_low;
+extern uint32_t wrist_left_limit_high;
+constexpr uint32_t wrist_right_steps_per_rev = MOTOR_STEPS_PER_REV * WRIST_RIGHT_RR;
+extern uint32_t wrist_right_limit_low;
+extern uint32_t wrist_right_limit_high;
 #endif
 
 #endif

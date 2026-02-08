@@ -5,4 +5,7 @@
 uint16_t rad_to_steps(uint16_t radians);
 uint16_t steps_to_rad(uint16_t steps);
 
+template <typename T>
+T clamp(T v, T lo, T hi);
+
 #endif
