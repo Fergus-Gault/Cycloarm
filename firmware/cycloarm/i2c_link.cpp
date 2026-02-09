@@ -1,7 +1,5 @@
 #include "cycloarm.h"
 
-// TODO: Update this to mimick the serial implementation.
-
 void i2c_init()
 {
     if (!Wire.available())
@@ -10,13 +8,11 @@ void i2c_init()
     }
 }
 
-template <typename T>
-void i2c_write(msg_type_t type, T data)
+void i2c_write(msg_type_t type, bool respond, byte *data_pointer = NO_DATA)
 {
     if (!Wire.available())
-    {
         i2c_init();
-    }
+
     switch (type)
     {
     case MSG_PING:
@@ -27,29 +23,29 @@ void i2c_write(msg_type_t type, T data)
         break;
     case MSG_STATUS:
         Wire.write(MSG_STATUS);
-        if (data != NO_DATA)
-        {
-            Wire.write(data);
-        }
+
+        if (*data_pointer != NO_DATA)
+            i2c_send_structure(data_pointer, sizeof(&data_pointer));
+        else
+            Wire.write(MSG_RESPOND);
         Wire.write(MSG_END);
         break;
     case MSG_SEGMENT:
-        if (data == NO_DATA)
-        {
-            break;
-        }
         Wire.write(MSG_SEGMENT);
-        Wire.write(data);
+        i2c_send_structure(data_pointer, sizeof(&data_pointer));
+        if (respond)
+            Wire.write(MSG_RESPOND);
+        Wire.write(MSG_END);
         break;
     case MSG_SEGMENT_ACK:
         Wire.write(MSG_SEGMENT_ACK);
         break;
     case MSG_FAULT:
         Wire.write(MSG_FAULT);
-        if (data != NO_DATA)
-        {
-            Wire.write(data);
-        }
+        if (*data_pointer != NO_DATA)
+            i2c_send_structure(data_pointer, sizeof(&data_pointer));
+        if (respond)
+            Wire.write(MSG_RESPOND);
         Wire.write(MSG_END);
         break;
     case MSG_HOME:
@@ -60,37 +56,45 @@ void i2c_write(msg_type_t type, T data)
         break;
     case MSG_END:
         break;
+    case MSG_RESPOND:
+        break;
     }
 }
 
 void i2c_read()
 {
     if (!Wire.available())
-    {
         i2c_init();
-    }
+
     if (Wire.available() > 0)
     {
         i2c_incoming_byte = Wire.read();
         switch (i2c_incoming_byte)
         {
         case MSG_PING:
-            i2c_write(MSG_PING_ACK, NO_DATA);
+            i2c_write(MSG_PING_ACK, false);
             break;
         case MSG_STATUS:
-            status_comb_t status = get_status();
-            i2c_write(MSG_STATUS, status);
+            i2c_peek_incoming_byte = Wire.peek();
+            if (i2c_peek_incoming_byte == MSG_RESPOND)
+            {
+                Wire.read();
+                status_comb_t status = get_status();
+                i2c_write(MSG_STATUS, false, (byte *)&status);
+            }
             i2c_peek_incoming_byte = Wire.peek();
             if (i2c_peek_incoming_byte != MSG_END)
             {
                 i2c_incoming_byte = Wire.read();
-                // TODO: Action incoming data
+                i2c_read_structure((byte *)&i2c_incoming_byte, sizeof(i2c_incoming_byte));
             }
-            break;
         case MSG_SEGMENT:
             i2c_incoming_byte = Wire.read();
-            // TODO: Action the incoming data
-            i2c_write(MSG_SEGMENT_ACK, NO_DATA);
+            i2c_read_structure((byte *)i2c_incoming_byte, sizeof(i2c_incoming_byte));
+            motion_enqueue((motion_segment_t *)i2c_incoming_byte);
+            i2c_peek_incoming_byte = Wire.peek();
+            if (i2c_peek_incoming_byte == MSG_RESPOND)
+                i2c_write(MSG_SEGMENT_ACK, false);
             break;
         case MSG_FAULT:
             i2c_peek_incoming_byte = Wire.peek();
@@ -109,6 +113,9 @@ void i2c_read()
             // set_zero();
             break;
         case MSG_END:
+            break;
+        case MSG_RESPOND:
+            // This should never happen, as respond should be consumed within other cases.
             break;
         }
     }

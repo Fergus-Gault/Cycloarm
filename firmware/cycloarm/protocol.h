@@ -18,14 +18,14 @@ typedef enum
 typedef struct
 {
     uint8_t board;
-    uint32_t speed[3];
-    uint32_t position[3];
+    uint32_t speed[4];
+    uint32_t position[4];
 } motion_segment_t;
 
 typedef struct
 {
     uint8_t board;
-    uint32_t positions[3];
+    uint32_t positions[4];
 } position_response_t;
 
 typedef struct

@@ -10,12 +10,14 @@
 #include <MultiStepper.h>
 
 #include "cpu_map.h"
-#include "config.h"
-#include "protocol.h"
-#include "stepper_core.h"
 #include "tools.h"
+#include "config.h"
+#include "logger.h"
+#include "protocol.h"
+#include "stepper.h"
 #include "serial.h"
 #include "i2c_link.h"
 #include "system.h"
+#include "motion.h"
 
 #endif

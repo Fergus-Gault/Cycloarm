@@ -10,9 +10,13 @@
 // will have to use compiler flags for this.
 
 void stepper_init();
+void enable_steppers();
 void move_segment(motion_segment_t motion);
 void set_zero_position();
 void calibrate();
+void calibrate_shoulder();
+void calibrate_elbow();
+void stepper_update();
 
 position_response_t poll_positions();
 
@@ -21,26 +25,15 @@ extern motion_segment_t *last_command;
 #ifdef BOARD_A
 extern MultiStepper board_a_steppers;
 constexpr uint32_t base_steps_per_rev = MOTOR_STEPS_PER_REV * BASE_RR;
-extern uint32_t base_limit_low;
-extern uint32_t base_limit_high;
 constexpr uint32_t shoulder_steps_per_rev = MOTOR_STEPS_PER_REV * SHOULDER_RR;
-extern uint32_t shoulder_limit_low;
-extern uint32_t shoulder_limit_high;
 constexpr uint32_t elbow_steps_per_rev = MOTOR_STEPS_PER_REV * ELBOW_RR;
-extern uint32_t elbow_limit_low;
-extern uint32_t elbow_limit_high;
 #endif
 #ifdef BOARD_B
 extern MultiStepper board_b_steppers;
 constexpr uint32_t wrist_roll_steps_per_rev = MOTOR_STEPS_PER_REV * WRIST_ROLL_RR;
-extern uint32_t wrist_roll_limit_low;
-extern uint32_t wrist_roll_limit_high;
 constexpr uint32_t wrist_left_steps_per_rev = MOTOR_STEPS_PER_REV * WRIST_LEFT_RR;
-extern uint32_t wrist_left_limit_low;
-extern uint32_t wrist_left_limit_high;
 constexpr uint32_t wrist_right_steps_per_rev = MOTOR_STEPS_PER_REV * WRIST_RIGHT_RR;
-extern uint32_t wrist_right_limit_low;
-extern uint32_t wrist_right_limit_high;
+constexpr uint32_t gripper_steps_per_rev = MOTOR_STEPS_PER_REV * GRIPPER_RR;
 #endif
 
 #endif
