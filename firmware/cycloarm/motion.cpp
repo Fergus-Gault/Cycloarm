@@ -2,7 +2,7 @@
 
 bool motion_enqueue(const motion_segment_t *seg)
 {
-    print_debug("Adding motion segment to queue.");
+    print_string("Adding motion segment to queue.");
     if (motion_q_full())
         return false;
 

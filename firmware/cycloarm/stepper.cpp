@@ -39,6 +39,10 @@ void stepper_init()
     pinMode(EN_PIN, OUTPUT);
     pinMode(SHOULDER_STEP_PIN, OUTPUT);
     pinMode(SHOULDER_DIR_PIN, OUTPUT);
+    pinMode(ELBOW_STEP_PIN, OUTPUT);
+    pinMode(ELBOW_DIR_PIN, OUTPUT);
+    pinMode(SHOULDER_LIMIT_PIN, INPUT_PULLUP);
+    pinMode(ELBOW_LIMIT_PIN, INPUT_PULLUP);
     board_a_steppers.addStepper(base);
     board_a_steppers.addStepper(shoulder);
     board_a_steppers.addStepper(elbow);
@@ -48,8 +52,7 @@ void stepper_init()
     shoulder.setAcceleration(SHOULDER_ACCEL);
     elbow.setMaxSpeed(ELBOW_MAX_SPEED);
     elbow.setAcceleration(ELBOW_ACCEL);
-    // enable_steppers();
-    print_debug("Initialised steppers on Board A.");
+    print_string("Initialised steppers on Board A.");
 #endif
 
 // Set up motor parameters for board B motors
@@ -66,8 +69,7 @@ void stepper_init()
     wrist_right.setAcceleration(WRIST_RIGHT_ACCEL);
     gripper.setMaxSpeed(GRIPPER_MAX_SPEED);
     gripper.setAcceleration(GRIPPER_ACCEL);
-    enable_steppers();
-    print_debug("Initialised steppers on Board B.");
+    print_string("Initialised steppers on Board B.");
 #endif
 }
 
@@ -80,7 +82,7 @@ void enable_steppers()
     base.enableOutputs();
     elbow.setEnablePin(EN_PIN);
     elbow.enableOutputs();
-    print_debug("Enabled outputs on Board A.");
+    print_string("Enabled outputs on Board A.");
 #endif
 
 #ifdef BOARD_B
@@ -92,7 +94,7 @@ void enable_steppers()
     wrist_right.enableOutputs();
     gripper.setEnablePin(EN_PIN);
     gripper.enableOutputs();
-    print_debug("Enabled outputs on Board B.");
+    print_string("Enabled outputs on Board B.");
 #endif
 }
 
@@ -118,7 +120,7 @@ void move_segment(motion_segment_t motion)
     board_a_steppers.moveTo((long *)motion.position);
     // This will run until all the steppers have reaches their position.
     // NOTE: This is blocking.
-    print_debug("Moving steppers on board A.");
+    print_string("Moving steppers on board A.");
     while (board_a_steppers.run())
         continue;
 #endif
@@ -132,7 +134,7 @@ void move_segment(motion_segment_t motion)
         motion.position[2] = clamp(motion.position[2], wrist_right_limit_low, wrist_right_limit_high);
         motion.position[3] = clamp(motion.position[3], gripper_limit_low, gripper_limit_high);
         board_b_steppers.moveTo((long *)motion.position);
-        print_debug("Moving steppers on board B.");
+        print_string("Moving steppers on board B.");
         while (board_b_steppers.run())
             continue;
     }
@@ -178,14 +180,14 @@ void set_zero_position()
 void calibrate()
 {
 #ifdef BOARD_A
-    print_debug("Starting calibration.");
-    print_debug("Starting shoulder calibration.");
+    print_string("Starting calibration.");
+    print_string("Starting shoulder calibration.");
     calibrate_shoulder();
-    print_debug("Shoulder calibration complete.");
-    print_debug("Starting elbow calibration.");
+    print_string("Shoulder calibration complete.");
+    print_string("Starting elbow calibration.");
     calibrate_elbow();
-    print_debug("Elbow calibration complete.");
-    print_debug("Calibration complete.");
+    print_string("Elbow calibration complete.");
+    print_string("Calibration complete.");
 #endif
 }
 
@@ -193,51 +195,63 @@ void calibrate_shoulder()
 {
 #ifdef BOARD_A
     bool at_limit = false;
-    shoulder.setSpeed(500);
-    shoulder.move(1000);
+    shoulder.setAcceleration(100);
+    shoulder.setMaxSpeed(500);
+    shoulder.move(-5000);
     while (!at_limit)
     {
-        shoulder.runSpeed();
-
-        if (digitalRead(SHOULDER_LIMIT_PIN) == LOW)
+        while (shoulder.run())
         {
-            print_debug("Detecting limit pin at LOW");
-            at_limit = true;
-            shoulder.stop();
+            if (digitalRead(SHOULDER_LIMIT_PIN) == LOW)
+            {
+                at_limit = true;
+                shoulder.stop();
+                break;
+            }
         }
     }
     at_limit = false;
-    print_debug("Detected end stop.");
-    // shoulder.setCurrentPosition(0);
-
-    // uint32_t off_switch = shoulder_steps_per_rev / 20;
-    // shoulder.moveTo(off_switch);
-
-    // while (shoulder.run())
-    // {
-    // }
-
-    shoulder.move(1000);
-    while (!at_limit)
-    {
-        shoulder.runSpeed();
-
-        if (digitalRead(SHOULDER_LIMIT_PIN) == LOW)
-        {
-            at_limit = true;
-            shoulder.stop();
-        }
-    }
-
-    uint16_t current_pos = shoulder.currentPosition();
-    uint16_t mid_point = current_pos / 2;
-    shoulder_limit_high = current_pos;
-    shoulder.moveTo(mid_point);
-
+    shoulder.setCurrentPosition(0);
     while (shoulder.run())
     {
     }
+    delay(1000);
+    while (digitalRead(SHOULDER_LIMIT_PIN) == LOW)
+    {
+        shoulder.move(100);
+        while (shoulder.run())
+        {
+        }
+    }
+    shoulder.stop();
+    while (shoulder.run())
+    {
+    }
+    delay(1000);
+    shoulder.move(5000);
+    while (!at_limit)
+    {
+        while (shoulder.run())
+        {
+            if (digitalRead(SHOULDER_LIMIT_PIN) == LOW)
+            {
+                at_limit = true;
+                shoulder.stop();
+                break;
+            }
+        }
+    }
+    shoulder_limit_high = shoulder.currentPosition();
     at_limit = false;
+    while (shoulder.run())
+    {
+    }
+    int16_t mid_point = shoulder_limit_high / 2;
+    shoulder.moveTo(mid_point);
+    while (shoulder.run())
+    {
+    }
+
 #endif
 }
 
@@ -245,7 +259,9 @@ void calibrate_elbow()
 {
 #ifdef BOARD_A
     bool at_limit = false;
-    elbow.move(5000);
+    elbow.setAcceleration(100);
+    elbow.setMaxSpeed(500);
+    elbow.move(-5000);
     while (!at_limit)
     {
         while (elbow.run())
@@ -258,17 +274,24 @@ void calibrate_elbow()
             }
         }
     }
-    print_debug("End stop detected.");
     at_limit = false;
     elbow.setCurrentPosition(0);
-
-    // Move the motor off the switch
-    uint16_t off_switch = elbow_steps_per_rev / 20;
-    elbow.moveTo(off_switch);
     while (elbow.run())
     {
     }
-
+    delay(1000);
+    while (digitalRead(ELBOW_LIMIT_PIN) == LOW)
+    {
+        elbow.move(100);
+        while (elbow.run())
+        {
+        }
+    }
+    elbow.stop();
+    while (elbow.run())
+    {
+    }
+    delay(1000);
     elbow.move(5000);
     while (!at_limit)
     {
@@ -282,16 +305,16 @@ void calibrate_elbow()
             }
         }
     }
-
-    uint16_t current_pos = elbow.currentPosition();
-    elbow_limit_high = current_pos;
-    uint16_t mid_point = current_pos / 2;
-
+    elbow_limit_high = elbow.currentPosition();
+    at_limit = false;
+    while (elbow.run())
+    {
+    }
+    int16_t mid_point = elbow_limit_high / 2;
     elbow.moveTo(mid_point);
     while (elbow.run())
     {
     }
-    at_limit = false;
 #endif
 }
 

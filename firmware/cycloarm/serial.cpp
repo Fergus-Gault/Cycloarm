@@ -4,7 +4,7 @@ void serial_init()
 {
     if (!Serial.available())
         Serial.begin(BAUD_RATE);
-    print_debug("Serial initialised.");
+    print_string("Serial initialised.");
 }
 
 // This handles the movement of data between the computer and Arduino
@@ -82,11 +82,11 @@ void serial_read()
         {
         case MSG_PING:
             serial_write(MSG_PING_ACK, false);
-            print_debug("Received ping over serial.");
+            print_string("Received ping over serial.");
             break;
         case MSG_STATUS:
             serial_peek_incoming_byte = Serial.peek();
-            print_debug("Received status request over serial.");
+            print_string("Received status request over serial.");
             if (serial_peek_incoming_byte == MSG_RESPOND)
             {
                 // Consume data
@@ -108,7 +108,7 @@ void serial_read()
             // to queue motions.
             // TODO: Action that segment by loading it to a motion buffer or something
             // Since a motion segment, we know that data will follow, so we read it.
-            print_debug("Received motion segment over serial.");
+            print_string("Received motion segment over serial.");
             serial_incoming_byte = Serial.read();
             serial_read_structure((byte *)serial_incoming_byte, sizeof(serial_incoming_byte));
             motion_enqueue((motion_segment_t *)serial_incoming_byte);
